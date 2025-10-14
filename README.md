@@ -148,7 +148,13 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## Автори
 
+<<<<<<< HEAD
 - Команда розробників nOHACK
+=======
+- Команда розробників Nohack
+- Nolimiter
+- QWEN CODER
+>>>>>>> ab484c564d34d9ff4695ddd44910247adc16e643
 
 ## Ліцензія
 
