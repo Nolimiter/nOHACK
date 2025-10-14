@@ -4,17 +4,17 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: hackex-postgres
+    container_name: nOHACK-postgres
     environment:
-      POSTGRES_DB: hackex_db
-      POSTGRES_USER: hackex_user
-      POSTGRES_PASSWORD: hackex_password
+      POSTGRES_DB: nOHACK_db
+      POSTGRES_USER: nOHACK_user
+      POSTGRES_PASSWORD: nOHACK_password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hackex_user -d hackex_db"]
+      test: ["CMD-SHELL", "pg_isready -U nOHACK_user -d nOHACK_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: hackex-redis
+    container_name: nOHACK-redis
     ports:
       - "6379:6379"
     volumes:
@@ -38,12 +38,12 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
-    container_name: hackex-backend
+    container_name: nOHACK-backend
     ports:
       - "4000:4000"
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://hackex_user:hackex_password@postgres:5432/hackex_db
+      DATABASE_URL: postgresql://nOHACK_user:nOHACK_password@postgres:5432/nOHACK_db
       REDIS_URL: redis://redis:6379
       JWT_SECRET: your-super-secret-jwt-key-here-32-chars-min
       BCRYPT_ROUNDS: 12
@@ -60,7 +60,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
-    container_name: hackex-frontend
+    container_name: nOHACK-frontend
     ports:
       - "3000:3000"
     environment:
@@ -72,7 +72,7 @@ services:
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
-    container_name: hackex-nginx
+    container_name: nOHACK-nginx
     ports:
       - "80:80"
       - "443:443"

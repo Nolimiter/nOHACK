@@ -43,9 +43,9 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: hackex_test
-          POSTGRES_USER: hackex_test_user
-          POSTGRES_PASSWORD: hackex_test_password
+          POSTGRES_DB: nOHACK_test
+          POSTGRES_USER: nOHACK_test_user
+          POSTGRES_PASSWORD: nOHACK_test_password
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -85,7 +85,7 @@ jobs:
           cd backend
           npx prisma migrate deploy
         env:
-          DATABASE_URL: postgresql://hackex_test_user:hackex_test_password@localhost:5432/hackex_test
+          DATABASE_URL: postgresql://nOHACK_test_user:nOHACK_test_password@localhost:5432/nOHACK_test
 
       - name: Run backend linting
         run: |
@@ -97,7 +97,7 @@ jobs:
           cd backend
           npm run test
         env:
-          DATABASE_URL: postgresql://hackex_test_user:hackex_test_password@localhost:5432/hackex_test
+          DATABASE_URL: postgresql://nOHACK_test_user:nOHACK_test_password@localhost:5432/nOHACK_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-jwt-secret-for-ci-32-chars-minimum
           BCRYPT_ROUNDS: 12

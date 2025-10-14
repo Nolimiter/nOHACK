@@ -1,7 +1,7 @@
 {
-  "name": "hackex",
+  "name": "nOHACK",
   "version": "1.0.0",
-  "description": "HackEX - Веб-браузерна гра 'Хакерський симулятор'",
+  "description": "nOHACK - Веб-браузерна гра 'Хакерський симулятор'",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
@@ -32,7 +32,7 @@
     "web-game",
     "cybersecurity"
   ],
-  "author": "HackEX Development Team",
+  "author": "nOHACK Development Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.0"

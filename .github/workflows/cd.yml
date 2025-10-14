@@ -26,8 +26,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/hackex-frontend
-            ${{ secrets.DOCKERHUB_USERNAME }}/hackex-backend
+            ${{ secrets.DOCKERHUB_USERNAME }}/nOHACK-frontend
+            ${{ secrets.DOCKERHUB_USERNAME }}/nOHACK-backend
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
@@ -39,7 +39,7 @@ jobs:
           context: ./frontend
           file: ./docker/Dockerfile.frontend
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hackex-frontend:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nOHACK-frontend:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push backend image
@@ -48,7 +48,7 @@ jobs:
           context: ./backend
           file: ./docker/Dockerfile.backend
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hackex-backend:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nOHACK-backend:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
   # Deploy to Production
@@ -71,7 +71,7 @@ jobs:
           # 
           # Example (you would need to set up SSH keys in GitHub Secrets):
           # ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-          #   "cd /opt/hackex && \
+          #    "cd /opt/nOHACK && \
           #    docker-compose pull && \
           #    docker-compose up -d && \
           #    docker system prune -f"

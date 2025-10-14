@@ -1,4 +1,4 @@
-# HackEX Deployment Guide
+# nOHACK Deployment Guide
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -12,7 +12,7 @@
 
 ## Prerequisites
 
-Before deploying HackEX, ensure you have the following:
+Before deploying nOHACK, ensure you have the following:
 
 1. **Server Requirements**:
    - Ubuntu 20.04 LTS or newer (recommended)
@@ -59,8 +59,8 @@ sudo reboot
 
 ```bash
 # Clone the repository
-git clone <repository-url> hackex
-cd hackex
+git clone <repository-url> nOHACK
+cd nOHACK
 
 # Switch to the production branch (if applicable)
 git checkout main
@@ -76,7 +76,7 @@ Create `.env.production` files in both frontend and backend directories:
 ```env
 NODE_ENV=production
 PORT=4000
-DATABASE_URL=postgresql://hackex_user:hackex_password@postgres:5432/hackex_db
+DATABASE_URL=postgresql://nOHACK_user:nOHACK_password@postgres:5432/nOHACK_db
 REDIS_URL=redis://redis:6379
 JWT_SECRET=your-super-secret-jwt-key-here-32-chars-min
 BCRYPT_ROUNDS=12
@@ -136,8 +136,8 @@ sudo apt install postgresql postgresql-contrib -y
 
 # Create database user and database
 sudo -u postgres psql
-CREATE USER hackex_user WITH PASSWORD 'hackex_password';
-CREATE DATABASE hackex_db OWNER hackex_user;
+CREATE USER nOHACK_user WITH PASSWORD 'nOHACK_password';
+CREATE DATABASE nOHACK_db OWNER nOHACK_user;
 \q
 
 # Install Redis
@@ -164,12 +164,12 @@ docker build -t hackex-frontend -f docker/Dockerfile.frontend .
 
 ```bash
 # Tag images
-docker tag hackex-backend your-dockerhub-username/hackex-backend:latest
-docker tag hackex-frontend your-dockerhub-username/hackex-frontend:latest
+docker tag nOHACK-backend your-dockerhub-username/nOHACK-backend:latest
+docker tag nOHACK-frontend your-dockerhub-username/nOHACK-frontend:latest
 
 # Push to Docker Hub
-docker push your-dockerhub-username/hackex-backend:latest
-docker push your-dockerhub-username/hackex-frontend:latest
+docker push your-dockerhub-username/nOHACK-backend:latest
+docker push your-dockerhub-username/nOHACK-frontend:latest
 ```
 
 ## Deployment Options
@@ -225,8 +225,8 @@ npx serve -s out -l 3000
 
 ```bash
 # Copy Nginx configuration
-sudo cp nginx/nginx.conf /etc/nginx/sites-available/hackex
-sudo ln -s /etc/nginx/sites-available/hackex /etc/nginx/sites-enabled/
+sudo cp nginx/nginx.conf /etc/nginx/sites-available/nOHACK
+sudo ln -s /etc/nginx/sites-available/nOHACK /etc/nginx/sites-enabled/
 
 # Test configuration
 sudo nginx -t
@@ -270,13 +270,13 @@ crontab -e
 
 # Add these lines:
 # Daily backup at 2 AM
-0 2 * * * /path/to/hackex/scripts/backup.sh
+0 2 * * * /path/to/nOHACK/scripts/backup.sh
 
 # Weekly cleanup on Sundays at 3 AM
 0 3 * * 0 /path/to/hackex/scripts/cleanup.sh
 
 # Daily market reset at midnight
-0 0 * * * cd /path/to/hackex/backend && npx ts-node scripts/market-reset.ts
+0 0 * * cd /path/to/nOHACK/backend && npx ts-node scripts/market-reset.ts
 ```
 
 ## Monitoring and Maintenance
@@ -330,11 +330,11 @@ Implement regular backups:
 # Database backup script (backup.sh)
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/backups/hackex"
+BACKUP_DIR="/backups/nOHACK"
 mkdir -p $BACKUP_DIR
 
 # Backup database
-docker exec hackex-postgres pg_dump -U hackex_user hackex_db > $BACKUP_DIR/db_backup_$DATE.sql
+docker exec nOHACK-postgres pg_dump -U nOHACK_user nOHACK_db > $BACKUP_DIR/db_backup_$DATE.sql
 
 # Compress backup
 gzip $BACKUP_DIR/db_backup_$DATE.sql
