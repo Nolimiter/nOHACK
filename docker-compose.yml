@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: hackex-postgres
+    environment:
+      POSTGRES_DB: hackex_db
+      POSTGRES_USER: hackex_user
+      POSTGRES_PASSWORD: hackex_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hackex_user -d hackex_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: hackex-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: hackex-backend
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://hackex_user:hackex_password@postgres:5432/hackex_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret-jwt-key-here-32-chars-min
+      BCRYPT_ROUNDS: 12
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Frontend Application
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: hackex-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: hackex-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

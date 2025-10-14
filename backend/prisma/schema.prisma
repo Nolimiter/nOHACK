@@ -1,0 +1,681 @@
+// prisma/schema.prisma
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// ==================== USER MODELS ====================
+
+
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+ email         String    @unique
+  passwordHash  String
+  emailVerified Boolean   @default(false)
+  
+  // Game Stats
+  level         Int       @default(1)
+  experience    Int       @default(0)
+  reputation    Int       @default(0)
+  bitcoins      Float     @default(100.0)
+  darkTokens    Int       @default(0)
+  
+  // Faction & Guild
+  factionId     String?
+  faction       Faction?  @relation(fields: [factionId], references: [id])
+  guildId       String?
+  guild         Guild?    @relation(fields: [guildId], references: [id])
+  guildRole     GuildRole @default(MEMBER)
+  
+  // Profile
+  avatar        String?
+  bio           String?
+  country       String?
+  
+  // Security
+  lastLogin     DateTime?
+  loginAttempts Int       @default(0)
+  lockedUntil   DateTime?
+  twoFactorEnabled Boolean @default(false)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  skills        UserSkill[]
+  inventory     InventoryItem[]
+  operations    Operation[]
+  attacks       Attack[]       @relation("Attacker")
+  defenses      Attack[]       @relation("Defender")
+  missions      UserMission[]
+  achievements  UserAchievement[]
+  transactions  Transaction[]
+  messages      Message[]      @relation("Sender")
+  receivedMsg   Message[]      @relation("Receiver")
+  friendsFrom   Friendship[]   @relation("UserFrom")
+  friendsTo     Friendship[]   @relation("UserTo")
+  listings      MarketListing[]
+  reviews       Review[]
+  logs          SecurityLog[]
+  notifications Notification[]
+  
+  @@index([username])
+  @@index([email])
+  @@index([guildId])
+}
+
+
+// ==================== FACTION SYSTEM ====================
+
+
+model Faction {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  color       String
+  bonuses     Json     // { attackBonus: 20, defenseBonus: 0, ... }
+  
+  users       User[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+// ==================== GUILD SYSTEM ====================
+
+
+model Guild {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  tag         String    @unique @db.VarChar(5)
+  description String?
+  
+  level       Int       @default(1)
+  experience  Int       @default(0)
+  treasury    Float     @default(0)
+  maxMembers  Int       @default(20)
+  
+  leaderId    String
+  
+  isRecruiting Boolean  @default(true)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  members     User[]
+  wars        GuildWar[] @relation("GuildWars")
+  activities GuildActivity[]
+  
+  @@index([name])
+  @@index([tag])
+}
+
+
+enum GuildRole {
+  LEADER
+  OFFICER
+ MEMBER
+  RECRUIT
+}
+
+
+model GuildWar {
+  id            String       @id @default(uuid())
+  
+  attackerGuildId String
+ defenderGuildId String
+  
+  attackerGuild Guild        @relation("GuildWars", fields: [attackerGuildId], references: [id])
+  defenderGuild Guild        @relation("GuildWars", fields: [defenderGuildId], references: [id])
+  
+ status        WarStatus    @default(DECLARED)
+  attackerScore Int          @default(0)
+  defenderScore Int          @default(0)
+  
+  startDate     DateTime
+  endDate       DateTime
+  
+  winnerId      String?
+  
+  createdAt     DateTime     @default(now())
+  
+  battles       WarBattle[]
+  
+  @@index([attackerGuildId])
+  @@index([defenderGuildId])
+}
+
+
+enum WarStatus {
+  DECLARED
+  ACTIVE
+  COMPLETED
+}
+
+
+model WarBattle {
+  id        String   @id @default(uuid())
+  warId     String
+  war       GuildWar @relation(fields: [warId], references: [id])
+  
+  attackerId String
+  defenderId String
+  
+  result    BattleResult
+  
+  timestamp DateTime @default(now())
+  
+  @@index([warId])
+}
+
+
+enum BattleResult {
+  ATTACKER_WIN
+  DEFENDER_WIN
+  DRAW
+}
+
+
+model GuildActivity {
+  id        String   @id @default(uuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  
+  type      String
+  message   String
+ metadata  Json?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([guildId])
+  @@index([createdAt])
+}
+
+
+// ==================== SKILLS SYSTEM ====================
+
+
+model Skill {
+  id          String   @id @default(uuid())
+  name        String   @unique
+ category    String
+ description String
+  maxLevel    Int      @default(100)
+  
+  userSkills  UserSkill[]
+  
+  createdAt   DateTime @default(now())
+}
+
+
+model UserSkill {
+  id         String   @id @default(uuid())
+  userId     String
+  skillId    String
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill      Skill    @relation(fields: [skillId], references: [id])
+  
+  level      Int      @default(1)
+  experience Int      @default(0)
+  
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([userId, skillId])
+  @@index([userId])
+}
+
+
+// ==================== INVENTORY SYSTEM ====================
+
+
+model Item {
+  id          String   @id @default(uuid())
+  name        String
+ type        ItemType
+  category    String
+  rarity      Rarity
+  description String
+  
+  basePrice   Float
+  stats       Json     // { power: 100, stealth: 50, ... }
+  requirements Json?   // { level: 10, skill: "hacking:5" }
+  
+  isStackable Boolean  @default(false)
+  maxStack    Int      @default(1)
+  
+  createdAt   DateTime @default(now())
+  
+  inventoryItems InventoryItem[]
+  marketListings MarketListing[]
+}
+
+
+enum ItemType {
+  TOOL
+  EXPLOIT
+  DATA
+  HARDWARE
+  CONSUMABLE
+  COSMETIC
+}
+
+
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+
+model InventoryItem {
+  id        String   @id @default(uuid())
+  userId    String
+ itemId    String
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item      Item     @relation(fields: [itemId], references: [id])
+  
+  quantity  Int      @default(1)
+  equipped  Boolean  @default(false)
+  
+  acquiredAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([itemId])
+}
+
+
+// ==================== MARKET SYSTEM ====================
+
+
+model MarketListing {
+  id          String        @id @default(uuid())
+  sellerId    String
+  itemId      String
+  
+  seller      User          @relation(fields: [sellerId], references: [id])
+  item        Item          @relation(fields: [itemId], references: [id])
+  
+  quantity    Int
+  pricePerUnit Float
+  
+  status      ListingStatus @default(ACTIVE)
+  
+  expiresAt   DateTime
+  createdAt   DateTime      @default(now())
+  
+  transactions Transaction[]
+  
+  @@index([sellerId])
+  @@index([itemId])
+  @@index([status])
+}
+
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+  EXPIRED
+}
+
+
+model Transaction {
+  id          String        @id @default(uuid())
+  
+ buyerId     String
+  buyer       User          @relation(fields: [buyerId], references: [id])
+  
+  listingId   String
+ listing     MarketListing @relation(fields: [listingId], references: [id])
+  
+  quantity    Int
+  totalPrice  Float
+  fee         Float
+  
+  createdAt   DateTime      @default(now())
+  
+  @@index([buyerId])
+  @@index([listingId])
+}
+
+
+model Review {
+  id          String   @id @default(uuid())
+  
+  reviewerId  String
+  reviewer    User     @relation(fields: [reviewerId], references: [id])
+  
+  targetId    String   // Can be user or listing
+  targetType  String   // "user" or "listing"
+  
+  rating      Int      // 1-5
+  comment     String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([targetId])
+  @@index([reviewerId])
+}
+
+
+// ==================== OPERATIONS & ATTACKS ====================
+
+
+model Operation {
+  id          String          @id @default(uuid())
+  userId      String
+ user        User            @relation(fields: [userId], references: [id])
+  
+ type        OperationType
+  targetId    String?         // User ID or NPC ID
+  targetType String          // "player" or "npc"
+  
+  status      OperationStatus @default(QUEUED)
+  progress    Float           @default(0)
+  
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  result      Json?           // { success: true, loot: {...}, ... }
+  
+  createdAt   DateTime        @default(now())
+  
+  @@index([userId])
+  @@index([status])
+}
+
+
+enum OperationType {
+  DDOS
+  SQL_INJECTION
+  RANSOMWARE
+ BRUTE_FORCE
+ SOCIAL_ENGINEERING
+ PORT_SCAN
+  MINING
+  DATA_THEFT
+}
+
+
+enum OperationStatus {
+  QUEUED
+  IN_PROGRESS
+ COMPLETED
+  FAILED
+  CANCELLED
+}
+
+
+model Attack {
+  id          String   @id @default(uuid())
+  
+  attackerId  String
+  defenderId  String
+  
+  attacker    User     @relation("Attacker", fields: [attackerId], references: [id])
+  defender    User     @relation("Defender", fields: [defenderId], references: [id])
+  
+  type        OperationType
+ success     Boolean
+ damage      Int      @default(0)
+  loot        Json?
+  
+  detected    Boolean  @default(false)
+  
+  timestamp   DateTime @default(now())
+  
+  @@index([attackerId])
+  @@index([defenderId])
+  @@index([timestamp])
+}
+
+
+// ==================== SECURITY & DEFENSE ====================
+
+
+model SecurityLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  eventType   String   // "login", "attack_detected", "firewall_trigger", etc.
+  severity    Severity
+  message     String
+ metadata    Json?
+  
+  ipAddress   String?
+  
+  timestamp   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@index([severity])
+}
+
+
+enum Severity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+
+model Defense {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  
+  firewallLevel    Int @default(1)
+  idsLevel         Int @default(0)
+  honeypotActive   Boolean @default(false)
+  backupFrequency  String @default("daily")
+  
+  lastUpdated DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+
+// ==================== MISSIONS & QUESTS ====================
+
+
+model Mission {
+  id          String   @id @default(uuid())
+  
+  title       String
+ description String
+  type        MissionType
+  difficulty  Int      // 1-5
+  
+  objectives  Json     // [{ type: "hack", target: "...", count: 1 }]
+  rewards     Json     // { btc: 100, xp: 500, items: [...] }
+  
+  requirements Json?   // { level: 10, faction: "black_hat" }
+  
+  isRepeatable Boolean @default(false)
+  cooldown     Int?    // in hours
+  
+  expiresAt    DateTime?
+  
+  createdAt   DateTime @default(now())
+  
+  userMissions UserMission[]
+}
+
+
+enum MissionType {
+  STORY
+  DAILY
+  WEEKLY
+  EVENT
+  TUTORIAL
+}
+
+
+model UserMission {
+  id          String        @id @default(uuid())
+  userId      String
+  missionId   String
+  
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+ mission     Mission       @relation(fields: [missionId], references: [id])
+  
+  status      MissionStatus @default(ACTIVE)
+  progress    Json          // { objective1: 5/10, objective2: 1/1 }
+  
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  
+  @@unique([userId, missionId])
+  @@index([userId])
+  @@index([status])
+}
+
+
+enum MissionStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+  ABANDONED
+}
+
+
+// ==================== ACHIEVEMENTS ====================
+
+
+model Achievement {
+  id          String   @id @default(uuid())
+  
+  name        String   @unique
+  description String
+ icon        String
+ category    String
+  
+  requirements Json    // { condition: "total_attacks", value: 100 }
+  rewards      Json?   // { rep: 100, title: "Elite Hacker" }
+  
+  isSecret    Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  
+  userAchievements UserAchievement[]
+}
+
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+ achievementId String
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  unlockedAt    DateTime    @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+
+// ==================== SOCIAL SYSTEM ====================
+
+
+model Friendship {
+  id          String          @id @default(uuid())
+  
+  userFromId  String
+  userToId    String
+  
+  userFrom    User            @relation("UserFrom", fields: [userFromId], references: [id], onDelete: Cascade)
+  userTo      User            @relation("UserTo", fields: [userToId], references: [id], onDelete: Cascade)
+  
+  status      FriendshipStatus @default(PENDING)
+  
+  createdAt   DateTime        @default(now())
+  acceptedAt  DateTime?
+  
+  @@unique([userFromId, userToId])
+  @@index([userFromId])
+  @@index([userToId])
+}
+
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+
+model Message {
+  id          String   @id @default(uuid())
+  
+  senderId    String
+  receiverId  String
+  
+  sender      User     @relation("Sender", fields: [senderId], references: [id])
+  receiver    User     @relation("Receiver", fields: [receiverId], references: [id])
+  
+  subject     String?
+  body        String
+  
+  isRead      Boolean  @default(false)
+  
+  attachments Json?    // { items: [...], btc: 100 }
+  
+  sentAt      DateTime @default(now())
+  readAt      DateTime?
+  
+  @@index([receiverId, isRead])
+  @@index([senderId])
+}
+
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String   // "attack", "friend_request", "guild_invite", etc.
+  title     String
+  message   String
+ link      String?
+  
+  isRead    Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+
+// ==================== ANALYTICS ====================
+
+
+model GameEvent {
+  id        String   @id @default(uuid())
+  
+  userId    String?
+  eventType String
+  eventData Json
+  
+  timestamp DateTime @default(now())
+  
+  @@index([eventType])
+  @@index([timestamp])
+}
