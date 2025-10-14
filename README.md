@@ -148,7 +148,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## Автори
 
-- Команда розробників HackEX
+- Команда розробників nOHACK
 
 ## Ліцензія
 

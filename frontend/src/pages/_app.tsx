@@ -4,12 +4,13 @@ import { SessionProvider } from 'next-auth/react';
 import { AuthProvider } from '../contexts/AuthContext';
 import { GameProvider } from '../contexts/GameContext';
 
-function MyApp({ Component, pageProps: { session, ...pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
+  const { session, ...restPageProps } = pageProps;
   return (
     <SessionProvider session={session}>
       <AuthProvider>
         <GameProvider>
-          <Component {...pageProps} />
+          <Component {...restPageProps} />
         </GameProvider>
       </AuthProvider>
     </SessionProvider>

@@ -123,23 +123,38 @@ const DashboardPage: NextPage = () => {
                       <div className="text-sm text-gray-400">{operation.status}</div>
                     </div>
                   <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                    <div 
-                      className="bg-green-600 h-2.5 rounded-full" 
-                      style={{ width: `${operation.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-gray-800 p-8 rounded-lg text-center">
-              <p>У вас немає активних операцій</p>
-              <Link href="/game/hack" className="text-green-400 hover:underline mt-2 inline-block">
-                Розпочати нову операцію
-              </Link>
-            </div>
-          )}
-        </section>
+                                       <div
+                                         className="bg-green-600 h-2.5 rounded-full"
+                                         style={{ width: `${operation.progress}%` }}
+                                       ></div>
+                                     </div>
+                                   </div>
+                                 ))}
+                               </div>
+                             ) : (
+                               <div className="bg-gray-800 p-8 rounded-lg text-center">
+                                 <p>У вас немає активних операцій</p>
+                                 <Link href="/game/hack" className="text-green-400 hover:underline mt-2 inline-block">
+                                   Розпочати нову операцію
+                                 </Link>
+                               </div>
+                             )}
+                           </div>
+                         ))}
+                       </div>
+                     ) : (
+                       <div className="bg-gray-800 p-8 rounded-lg text-center">
+                         <p>У вас немає активних операцій</p>
+                         <Link href="/game/hack" className="text-green-400 hover:underline mt-2 inline-block">
+                           Розпочати нову операцію
+                         </Link>
+                       </div>
+                     )}
+                   </section>
+                 </section>
+               </section>
+           </section>
+         </section>
 
         {/* Recent Activity */}
         <section>
