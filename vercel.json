@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "cd nOHACK/frontend && npm install && npm run build",
+  "outputDirectory": "nOHACK/frontend/.next",
+  "installCommand": "cd nOHACK/frontend && npm install",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/nOHACK/frontend/$1"
+    }
+  ]
+}
