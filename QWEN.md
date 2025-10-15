@@ -156,6 +156,24 @@ docker-compose -f docker-compose.prod.yml up -d
 - For Railway deployment, only the backend service is configured to build, as the frontend build was failing due to Next.js not being found
 - The Railway configuration specifically runs `npx prisma generate` as part of the build process to ensure Prisma client is generated
 
+## Common Deployment Issues and Solutions
+
+### Frontend Build Failure
+**Issue**: `sh: 1: next: not found`
+**Cause**: The Next.js CLI is not available in the build environment
+**Solution**: The railway.toml is configured to build only the backend service, bypassing the frontend build issue
+
+### Docker Build Errors
+**Issue**: Docker build failing with exit code 127 during frontend build
+**Cause**: Missing Next.js dependency or incorrect build environment
+**Solution**: 
+1. Use the railway.toml configuration to build only backend services
+2. Or ensure Next.js is properly installed in the Docker environment with `npm install next -g` in Dockerfile if full-stack deployment is required
+
+### Prisma Schema Validation
+**Issue**: Prisma relation naming conflicts
+**Solution**: Properly define bidirectional relations with unique names in schema.prisma as implemented in the recent fixes
+
 ## Backend Fixes and Improvements
 
 Recent updates have resolved TypeScript compilation errors in the backend by:
