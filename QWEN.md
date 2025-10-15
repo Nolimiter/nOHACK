@@ -130,6 +130,16 @@ docker-compose -f docker-compose.prod.yml up -d
 - `npm run prisma:generate`: Generates Prisma client
 - `npm run prisma:migrate`: Runs Prisma database migrations
 
+### Development Workflow
+
+For effective development on the nOHACK project:
+
+1. **Before committing**: Run `npm run lint` and `npm run test` to ensure code quality
+2. **Database changes**: Always use Prisma migrations (`npx prisma migrate dev`) and update the schema accordingly
+3. **Environment setup**: Ensure all required environment variables are set before starting services
+4. **Testing changes**: Use the test suite to verify functionality before submitting changes
+5. **Frontend and backend integration**: Test API endpoints with frontend components to ensure compatibility
+
 ## Key Features
 
 - **Hacking System**: Multiple attack types (DDoS, SQL injection, ransomware, zero days)
