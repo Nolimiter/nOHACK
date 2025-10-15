@@ -174,6 +174,10 @@ docker-compose -f docker-compose.prod.yml up -d
 **Issue**: Prisma relation naming conflicts
 **Solution**: Properly define bidirectional relations with unique names in schema.prisma as implemented in the recent fixes
 
+### TypeScript Compilation Errors
+**Issue**: Various TypeScript compilation errors in backend services (guild, hacking, market, social services)
+**Solution**: Fixed by updating relations, adding missing functions, improving error handling and updating return types as detailed in the 'Backend Fixes and Improvements' section
+
 ## Backend Fixes and Improvements
 
 Recent updates have resolved TypeScript compilation errors in the backend by:
