@@ -155,3 +155,17 @@ docker-compose -f docker-compose.prod.yml up -d
 - The backend requires environment variables: DATABASE_URL, REDIS_URL, JWT_SECRET, BCRYPT_ROUNDS, FRONTEND_URL
 - For Railway deployment, only the backend service is configured to build, as the frontend build was failing due to Next.js not being found
 - The Railway configuration specifically runs `npx prisma generate` as part of the build process to ensure Prisma client is generated
+
+## Backend Fixes and Improvements
+
+Recent updates have resolved TypeScript compilation errors in the backend by:
+
+- **Added GuildMember Model**: Created a new GuildMember model in Prisma schema to properly handle relationships between Users and Guilds, including proper relation naming and bidirectional references.
+- **Fixed Guild Relations**: Updated all guild-related methods in `guild.service.ts` to use the new `guildMembers` relation instead of the old `members` relation.
+- **Added Missing Functions**: Added `calculateMarketPrice` function to `src/utils/gameLogic.ts` that was referenced but missing.
+- **Fixed Prisma Schema Issues**: Fixed relation naming conflicts in the GuildWar model and ensured proper bidirectional relations.
+- **Improved Error Handling**: Enhanced error handling in `hacking.service.ts` with proper null checks and error type checking.
+- **Updated Socket Handlers**: Fixed missing imports and variable references in `market.handler.ts`.
+- **Return Type Corrections**: Updated return types in `social.service.ts` to match actual returned data structures.
+
+These changes ensure the backend compiles successfully to the `dist` directory and can be deployed without TypeScript errors.
