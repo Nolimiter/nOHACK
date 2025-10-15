@@ -23,17 +23,22 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd nOHACK/frontend
+        cd frontend
         npm ci
 
     - name: Build project
       run: |
-        cd nOHACK/frontend
+        cd frontend
         npm run build
+
+    - name: Export static files
+      run: |
+        cd frontend
+        npm run export
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./nOHACK/frontend/out
+        publish_dir: ./frontend/out
         publish_branch: gh-pages
