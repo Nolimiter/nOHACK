@@ -32,14 +32,14 @@ const DashboardPage: NextPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Head>
-        <title>Панель керування - HackEX</title>
-        <meta name="description" content="Ваша панель керування в HackEX" />
+        <title>Панель керування - nOHACK</title>
+        <meta name="description" content="Ваша панель керування в nOHACK" />
       </Head>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex justify-between items-center py-6 border-b border-gray-800">
-          <div className="text-2xl font-bold text-green-400">HackEX</div>
+          <div className="text-2xl font-bold text-green-400">nOHACK</div>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>

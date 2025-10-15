@@ -9,14 +9,14 @@ const HomePage: NextPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Head>
-        <title>HackEX - Веб-браузерна гра "Хакерський симулятор"</title>
-        <meta name="description" content="HackEX - це багатокористувацька веб-гра в жанрі симулятора хакера" />
+        <title>nOHACK - Веб-браузерна гра "Хакерський симулятор"</title>
+        <meta name="description" content="nOHACK - це багатокористувацька веб-гра в жанрі симулятора хакера" />
       </Head>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex justify-between items-center py-6">
-          <div className="text-2xl font-bold text-green-40">HackEX</div>
+          <div className="text-2xl font-bold text-green-40">nOHACK</div>
           <nav>
             <ul className="flex space-x-6">
               <li><a href="#features" className="hover:text-green-40 transition-colors">Можливості</a></li>
@@ -129,7 +129,7 @@ const HomePage: NextPage = () => {
 
         {/* Footer */}
         <footer className="py-8 text-center text-gray-500 border-t border-gray-800">
-          <p>© {new Date().getFullYear()} HackEX. Всі права захищені.</p>
+          <p>© {new Date().getFullYear()} nOHACK. Всі права захищені.</p>
           <p className="mt-2">Ця гра створена виключно для освітніх цілей. Не застосовуйте отримані знання в реальному світі без дозволу.</p>
         </footer>
       </div>

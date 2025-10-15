@@ -31,12 +31,12 @@ const LoginPage: NextPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center text-white">
       <Head>
-        <title>Увійти - HackEX</title>
-        <meta name="description" content="Увійдіть до свого облікового запису HackEX" />
+        <title>Увійти - nOHACK</title>
+        <meta name="description" content="Увійдіть до свого облікового запису nOHACK" />
       </Head>
 
       <div className="bg-gray-800 p-8 rounded-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-8 text-green-400">Увійти до HackEX</h1>
+        <h1 className="text-3xl font-bold text-center mb-8 text-green-400">Увійти до nOHACK</h1>
         
         {error && (
           <div className="bg-red-900 text-red-200 p-3 rounded mb-6">
