@@ -1,0 +1,15 @@
+{
+  "build": {
+    "builder": "heroku/nodejs",
+    "include": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "tsconfig.json",
+      "prisma/schema.prisma",
+      "prisma/migrations/**/*"
+    ]
+  },
+  "startCommand": "npm start",
+  "healthcheck": "/health"
+}
