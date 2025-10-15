@@ -85,13 +85,21 @@ const HomePage: NextPage = () => {
                 <h3 className="text-xl font-bold mb-2">Створіть аккаунт</h3>
                 <p>Зареєструйте свій обліковий запис і створіть свій перший хакерський профіль. Оберіть свою першу спеціалізацію.</p>
               </div>
+            </div>
             <div className="flex items-start mb-10">
               <div className="bg-green-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 flex-shrink-0">2</div>
               <div>
                 <h3 className="text-xl font-bold mb-2">Навчіться основам</h3>
                 <p>Пройдіть навчальні місії, щоб зрозуміти основи зламу та захисту. Навчіться використовувати інструменти та методи.</p>
               </div>
+            <div className="flex items-start">
+              <div className="bg-green-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 flex-shrink-0">3</div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Почніть свою кампанію</h3>
+                <p>Виберіть свою першу ціль, сплануйте атаку та виконайте її. Збирайте ресурси, розвивайте навички, збільшуйте свій вплив.</p>
+              </div>
             </div>
+          </div>
             <div className="flex items-start">
               <div className="bg-green-600 rounded-full w-10 h-10 flex items-center justify-center mr-4 flex-shrink-0">3</div>
               <div>
