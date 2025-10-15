@@ -69,10 +69,10 @@ prisma/schema.prisma.bak
 backend/dist/
 backend/node_modules/
 
-# Frontend
-frontend/.next/
-frontend/node_modules/
-frontend/out/
+# Frontend build outputs only
+nOHACK/frontend/.next/
+nOHACK/frontend/node_modules/
+nOHACK/frontend/out/
 
 # Testing
 coverage/
