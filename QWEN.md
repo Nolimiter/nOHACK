@@ -169,3 +169,26 @@ Recent updates have resolved TypeScript compilation errors in the backend by:
 - **Return Type Corrections**: Updated return types in `social.service.ts` to match actual returned data structures.
 
 These changes ensure the backend compiles successfully to the `dist` directory and can be deployed without TypeScript errors.
+
+## Additional Backend Architecture Details
+
+The backend implements several key systems:
+
+- **Authentication System**: Uses JWT tokens and Passport.js for secure user authentication and authorization
+- **Game Logic Services**: Implements various game mechanics including hacking operations, defense systems, economic systems, and progression
+- **Real-time Communication**: WebSocket integration using Socket.io for real-time multiplayer features
+- **Data Validation**: Zod-based validation for API requests and responses to ensure data integrity
+- **Database Management**: Prisma ORM for type-safe database operations with PostgreSQL
+- **Caching Layer**: Redis integration for caching and session management
+- **Job Queues**: Bull for handling background jobs and scheduled tasks
+- **Logging**: Winston-based logging for error tracking and monitoring
+- **Security**: Helmet for security headers, rate limiting to prevent abuse, and various other security measures
+
+## Deployment Configuration
+
+The railway.toml file provides optimized configuration for deploying the backend service with:
+
+- NIXPACKS builder for flexible build processes
+- Explicit build command that ensures Prisma client is generated
+- Proper Node.js version specification (18.20.8)
+- Backend-focused start command that runs the compiled server
