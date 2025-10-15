@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
-import { useAuth } from '../../contexts/AuthContext';
-import { useGame } from '../../contexts/GameContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useGame } from '../contexts/GameContext';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
