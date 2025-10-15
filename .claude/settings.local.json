@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git ls-tree:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(find:*)",
+      "Bash(git revert:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm view:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

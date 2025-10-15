@@ -4,6 +4,7 @@ import { useGame } from '../../contexts/GameContext';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import MobileLayout from '../../components/MobileLayout';
 
 const DashboardPage: NextPage = () => {
   const { user, isAuthenticated } = useAuth();
@@ -30,99 +31,79 @@ const DashboardPage: NextPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+    <MobileLayout title="Панель керування" showBackButton={false}>
       <Head>
         <title>Панель керування - nOHACK</title>
         <meta name="description" content="Ваша панель керування в nOHACK" />
       </Head>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="flex justify-between items-center py-6 border-b border-gray-800">
-          <div className="text-2xl font-bold text-green-400">nOHACK</div>
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-sm">{connected ? 'Підключено' : 'Відключено'}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <div className="font-bold">{user?.username}</div>
-                <div className="text-sm text-gray-400">Рівень {user?.level || 1}</div>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                {user?.username?.charAt(0).toUpperCase()}
-              </div>
-            </div>
-          </div>
-        </header>
-
+      <div className="container mx-auto px-4 py-6">
         {/* Stats Overview */}
-        <section className="py-8">
-          <h1 className="text-3xl font-bold mb-6">Панель керування</h1>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="text-2xl font-bold text-green-40">{user?.bitcoins?.toFixed(2) || '100.00'}</div>
-              <div className="text-gray-400">Біткойни</div>
+        <section className="py-4">
+          <h1 className="text-xl md:text-2xl font-bold mb-4">Панель керування</h1>
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <div className="text-lg font-bold text-green-40">{user?.bitcoins?.toFixed(2) || '100.00'}</div>
+              <div className="text-xs text-gray-400">Біткойни</div>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="text-2xl font-bold text-green-400">{user?.reputation || 0}</div>
-              <div className="text-gray-400">Репутація</div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <div className="text-lg font-bold text-green-400">{user?.reputation || 0}</div>
+              <div className="text-xs text-gray-400">Репутація</div>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="text-2xl font-bold text-green-400">{user?.level || 1}</div>
-              <div className="text-gray-400">Рівень</div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <div className="text-lg font-bold text-green-400">{user?.level || 1}</div>
+              <div className="text-xs text-gray-400">Рівень</div>
             </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <div className="text-2xl font-bold text-green-40">{user?.experience || 0}</div>
-              <div className="text-gray-400">Досвід</div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <div className="text-lg font-bold text-green-40">{user?.experience || 0}</div>
+              <div className="text-xs text-gray-400">Досвід</div>
             </div>
           </div>
         </section>
 
         {/* Quick Actions */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Швидкі дії</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/game/hack" className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg text-center transition-colors">
-              <div className="text-4xl mb-2">🔓</div>
-              <div>Злам</div>
+        <section className="mb-6">
+          <h2 className="text-lg md:text-xl font-bold mb-3">Швидкі дії</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/game/hack" className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg text-center transition-colors">
+              <div className="text-2xl mb-1">🔓</div>
+              <div className="text-sm">Злам</div>
             </Link>
-            <Link href="/game/defense" className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg text-center transition-colors">
-              <div className="text-4xl mb-2">🔒</div>
-              <div>Захист</div>
+            <Link href="/game/defense" className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg text-center transition-colors">
+              <div className="text-2xl mb-1">🔒</div>
+              <div className="text-sm">Захист</div>
             </Link>
-            <Link href="/market" className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg text-center transition-colors">
-              <div className="text-4xl mb-2">🛒</div>
-              <div>Ринок</div>
+            <Link href="/market" className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg text-center transition-colors">
+              <div className="text-2xl mb-1">🛒</div>
+              <div className="text-sm">Ринок</div>
             </Link>
-            <Link href="/game/skills" className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg text-center transition-colors">
-              <div className="text-4xl mb-2">🧠</div>
-              <div>Навички</div>
+            <Link href="/game/skills" className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg text-center transition-colors">
+              <div className="text-2xl mb-1">🧠</div>
+              <div className="text-sm">Навички</div>
             </Link>
           </div>
         </section>
 
         {/* Active Operations - спрощений варіант */}
-        <section className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Активні операції</h2>
-            <Link href="/game/operations" className="text-green-400 hover:underline">Переглянути всі</Link>
+        <section className="mb-6">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg md:text-xl font-bold">Активні операції</h2>
+            <Link href="/game/operations" className="text-green-400 text-sm hover:underline">Переглянути всі</Link>
           </div>
-          <div className="bg-gray-800 p-8 rounded-lg text-center">
-            <p>Секція активних операцій (часово спрощена для збірки)</p>
+          <div className="bg-gray-800 p-4 rounded-lg text-center">
+            <p className="text-sm">Секція активних операцій (часово спрощена для збірки)</p>
           </div>
         </section>
 
         {/* Recent Activity */}
         <section>
-          <h2 className="text-2xl font-bold mb-4">Остання активність</h2>
-          <div className="bg-gray-800 rounded-lg p-6">
-            <p>Остання активність поки не реалізована</p>
+          <h2 className="text-lg md:text-xl font-bold mb-3">Остання активність</h2>
+          <div className="bg-gray-800 rounded-lg p-4">
+            <p className="text-sm">Остання активність поки не реалізована</p>
           </div>
         </section>
       </div>
-    </div>
+    </MobileLayout>
   );
 };
 
