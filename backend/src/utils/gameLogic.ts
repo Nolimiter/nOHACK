@@ -283,3 +283,32 @@ export async function updateMarketStats(
   // For now, we'll just log the action
  console.log(`Market action: ${action} for item ${itemId} with value ${value}`);
 }
+
+/**
+ * Calculate market price for an item based on supply, demand, and other factors
+ */
+export function calculateMarketPrice(itemId: string, basePrice: number, quantityAvailable: number, recentSales: number): number {
+  // Base price is affected by supply and demand
+  let price = basePrice;
+  
+  // If there's low supply (few items available), increase price
+  if (quantityAvailable < 5) {
+    price *= 1.5; // 50% increase for low supply
+  } else if (quantityAvailable < 10) {
+    price *= 1.2; // 20% increase for medium-low supply
+  } else if (quantityAvailable > 50) {
+    price *= 0.9; // 10% decrease for high supply
+  }
+  
+  // If there have been many recent sales, price might be trending up
+  if (recentSales > 20) {
+    price *= 1.1; // 10% increase for high demand
+  } else if (recentSales > 10) {
+    price *= 1.05; // 5% increase for moderate demand
+  } else if (recentSales < 3) {
+    price *= 0.85; // 15% decrease for low demand
+  }
+  
+  // Ensure price doesn't become too low
+  return Math.max(basePrice * 0.1, price);
+}

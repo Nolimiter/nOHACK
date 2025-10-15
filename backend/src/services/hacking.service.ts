@@ -101,7 +101,7 @@ export class HackingService {
       
       if (isSuccessful) {
         // Calculate loot based on target and operation type
-        const loot = calculateLoot(operation.type, operation.targetId);
+        const loot = calculateLoot(operation.type, operation.targetId!);
         result.loot = loot;
 
         // Update user stats based on successful operation
@@ -122,7 +122,7 @@ export class HackingService {
       });
 
       // If successful, create an attack record
-      if (isSuccessful) {
+      if (isSuccessful && operation.targetId) {
         await prisma.attack.create({
           data: {
             attackerId: operation.userId,
@@ -145,7 +145,10 @@ export class HackingService {
         data: {
           status: OperationStatus.FAILED,
           completedAt: new Date(),
-          result: { success: false, error: error.message },
+          result: { 
+            success: false, 
+            error: (error instanceof Error) ? error.message : 'Unknown error occurred' 
+          },
         },
       });
     }

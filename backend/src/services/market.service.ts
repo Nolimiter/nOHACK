@@ -291,6 +291,15 @@ export class MarketService {
         },
       });
 
+      // Get the item to check if it's stackable
+      const item = await tx.item.findUnique({
+        where: { id: listing.itemId },
+      });
+      
+      if (!item) {
+        throw new Error('Item not found for listing');
+      }
+
       // Return items to seller's inventory
       const existingInventoryItem = await tx.inventoryItem.findFirst({
         where: {
@@ -299,7 +308,7 @@ export class MarketService {
         },
       });
 
-      if (existingInventoryItem && updatedListing.item.isStackable) {
+      if (existingInventoryItem && item.isStackable) {
         // If item exists and is stackable, increase quantity
         await tx.inventoryItem.update({
           where: { id: existingInventoryItem.id },

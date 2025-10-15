@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { MarketService } from '../../services/market.service';
+import prisma from '../../config/database';
 
 // In-memory storage for market watchers
 // In a real application, you would use Redis or a database for persistence
@@ -78,7 +79,7 @@ export const handleMarketEvents = (io: Server, socket: Socket) => {
 
 // Function to broadcast market updates to watchers
 // This would be called from other parts of the application when market changes occur
-export const broadcastMarketUpdate = (itemId: string, updateType: 'price' | 'listing' | 'stats', data: any) => {
+export const broadcastMarketUpdate = (io: Server, itemId: string, updateType: 'price' | 'listing' | 'stats', data: any) => {
   if (marketWatchers[itemId]) {
     marketWatchers[itemId].forEach(socketId => {
       // In a real implementation, you would check if the socket is still connected

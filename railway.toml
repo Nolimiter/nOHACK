@@ -1,0 +1,15 @@
+# Railway configuration for nOHACK backend service
+
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacks]
+# Install dependencies and build only the backend
+build_cmd = "cd backend && npm install && npx prisma generate && npm run build"
+
+# Start command for the backend server
+start_cmd = "cd backend && npm start"
+
+# Node.js version to use
+[build.args]
+NODE_VERSION = "18.20.8"

@@ -454,7 +454,7 @@ export class SocialService {
  /**
    * Get user's friends
    */
-  static async getFriends(userId: string): Promise<User[]> {
+  static async getFriends(userId: string): Promise<Array<{ id: string; username: string; level: number; avatar: string | null }>> {
     const friendships = await prisma.friendship.findMany({
       where: {
         AND: [

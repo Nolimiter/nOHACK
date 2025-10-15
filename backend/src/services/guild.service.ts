@@ -54,25 +54,15 @@ export class GuildService {
         tag: input.tag,
         description: input.description,
         leaderId: input.leaderId,
-        members: {
-          create: {
-            userId: input.leaderId,
-            role: GuildRole.LEADER,
-          },
-        },
       },
-      include: {
-        members: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                level: true,
-              },
-            },
-          },
-        },
+    });
+
+    // Create the guild membership for the leader
+    await prisma.guildMember.create({
+      data: {
+        userId: input.leaderId,
+        guildId: guild.id,
+        role: GuildRole.LEADER,
       },
     });
 
@@ -82,7 +72,16 @@ export class GuildService {
       data: { guildId: guild.id },
     });
 
-    return guild;
+    // Return the created guild
+    const createdGuild = await prisma.guild.findUnique({
+      where: { id: guild.id },
+    });
+    
+    if (!createdGuild) {
+      throw new Error('Failed to retrieve created guild');
+    }
+    
+    return createdGuild;
   }
 
   /**
@@ -92,7 +91,7 @@ export class GuildService {
     return prisma.guild.findUnique({
       where: { id: guildId },
       include: {
-        members: {
+        guildMembers: {
           include: {
             user: {
               select: {
@@ -116,7 +115,7 @@ export class GuildService {
     return prisma.guild.findUnique({
       where: { name: guildName },
       include: {
-        members: {
+        guildMembers: {
           include: {
             user: {
               select: {
@@ -127,7 +126,6 @@ export class GuildService {
               },
             },
           },
-          orderBy: { role: 'asc' },
         },
       },
     });
@@ -375,7 +373,7 @@ export class GuildService {
       prisma.guild.findMany({
         where: { isRecruiting: true },
         include: {
-          members: {
+          guildMembers: {
             select: { id: true },
             take: 1, // Just to count members efficiently
           },
@@ -392,7 +390,7 @@ export class GuildService {
     // Add member count to each guild
     const guildsWithMemberCount = guilds.map(guild => ({
       ...guild,
-      memberCount: guild.members.length,
+      memberCount: guild.guildMembers.length,
     }));
 
     return { guilds: guildsWithMemberCount, total };
