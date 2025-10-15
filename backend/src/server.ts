@@ -1,3 +1,6 @@
+// Load environment variables first
+import 'dotenv/config';
+
 import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -26,9 +29,31 @@ const io = initializeSocket(server);
 
 // Middleware
 app.use(helmet()); // Security headers
+
+// CORS configuration - allow multiple origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  process.env.FRONTEND_URL,
+  'https://nohack.vercel.app',
+  // Allow all Vercel preview deployments
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is allowed or is a Vercel preview deployment
+    if (allowedOrigins.includes(origin) || origin.includes('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(compression()); // Compression
 app.use(express.json({ limit: '10mb' })); // JSON body parser
