@@ -36,6 +36,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   process.env.FRONTEND_URL,
   'https://nohack.vercel.app',
+  'https://nohack-ssx6uicgh-nolimiters-projects.vercel.app', // Vercel preview deployment
   // Allow all Vercel preview deployments
 ].filter(Boolean); // Remove undefined values
 
