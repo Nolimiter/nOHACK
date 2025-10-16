@@ -4,6 +4,7 @@ import { authenticate } from '../middleware/auth.middleware';
 import { handleGameEvents } from './handlers/game.handler';
 import { handleChatEvents } from './handlers/chat.handler';
 import { handleMarketEvents } from './handlers/market.handler';
+import SocketManager from './socket.manager';
 
 export interface ServerToClientEvents {
   // General events
@@ -49,6 +50,9 @@ export const initializeSocket = (httpServer: HTTPServer): SocketIOServer => {
     },
     transports: ['websocket', 'polling'],
   });
+
+  // Set the IO instance in SocketManager for global access
+  SocketManager.setIO(io);
 
   // Middleware for authentication
   io.use(async (socket: Socket, next) => {

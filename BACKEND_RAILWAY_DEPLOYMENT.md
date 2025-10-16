@@ -152,6 +152,14 @@ railway run -- env
 railway logs
 ```
 
+### Missing Environment Variables Error:
+If you see an error like:
+```
+Error: Missing required environment variables: DATABASE_URL, REDIS_URL, JWT_SECRET, BCRYPT_ROUNDS
+```
+
+This indicates that the required environment variables are not properly set in your deployment environment. Make sure all required environment variables are set in your Railway dashboard under the "Variables" tab.
+
 ## Verification
 
 Once deployed:
@@ -169,10 +177,10 @@ Once deployed:
 ## Environment Variables Summary
 
 Required environment variables:
-- `DATABASE_URL` (from Railway PostgreSQL addon)
-- `REDIS_URL` (from Railway Redis addon)
-- `JWT_SECRET` (min 32 chars, generated securely)
-- `BCRYPT_ROUNDS` (recommended: 12)
-- `FRONTEND_URL` (your Vercel frontend URL)
-- `NODE_ENV` (set to "production")
-- `PORT` (set by Railway, but app defaults to 4000)
+- `DATABASE_URL` (from Railway PostgreSQL addon) - Connection string for your PostgreSQL database (format: postgresql://username:password@host:port/database_name)
+- `REDIS_URL` (from Railway Redis addon) - Connection string for your Redis instance (format: redis://host:port or redis://:password@host:port)  
+- `JWT_SECRET` (min 32 chars, generated securely) - Secret key for JWT tokens (must be at least 32 characters long)
+- `BCRYPT_ROUNDS` (recommended: 12) - Number of bcrypt rounds for password hashing (value between 10-14, default 12)
+- `FRONTEND_URL` (your Vercel frontend URL) - URL of the frontend application (format: https://your-frontend.vercel.app)
+- `NODE_ENV` (set to "production") - Node.js environment (set to "production" for production deployments)
+- `PORT` (set by Railway, but app defaults to 4000) - Port for the application (Railway sets this automatically, default is 4000)

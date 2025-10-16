@@ -24,13 +24,14 @@ export const authService = {
     return response.data;
   },
 
-  async register(username: string, email: string, password: string) {
-    const response = await api.post('/auth/register', { username, email, password });
+  async register(username: string, email: string, password: string, confirmPassword: string) {
+    const response = await api.post('/auth/register', { username, email, password, confirmPassword });
     return response.data;
   },
 
   async getProfile(token: string) {
-    const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
+    // Use the configured api instance instead of direct axios call
+    const response = await api.get('/auth/profile', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -7,15 +7,86 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  # Backend Testing and Linting
+  backend-ci:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: test-jwt-secret-for-ci-pipeline-minimum-32-characters
+      BCRYPT_ROUNDS: 12
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Generate Prisma Client
+        run: |
+          cd backend
+          npx prisma generate
+
+      - name: Run Prisma migrations
+        run: |
+          cd backend
+          npx prisma migrate deploy
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test
+
+      - name: TypeScript type check
+        run: |
+          cd backend
+          npx tsc --noEmit
+
   # Frontend Linting and Testing
   frontend-ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -31,8 +102,14 @@ jobs:
           cd frontend
           npm run lint
 
-      - name: Run frontend tests
+      - name: TypeScript type check
         run: |
           cd frontend
-          npm run test
+          npx tsc --noEmit
 
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.example.com/api

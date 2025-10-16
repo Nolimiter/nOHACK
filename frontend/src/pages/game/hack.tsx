@@ -90,10 +90,10 @@ const HackPage: NextPage = () => {
                     onChange={(e) => setAttackType(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
                   >
-                    <option value="ddos">DDoS</option>
-                    <option value="sql_injection">SQL-ін'єкція</option>
-                    <option value="ransomware">Ренсомвейр</option>
-                    <option value="zero_day">Уразливість нульового дня</option>
+                    <option value="DDOS">DDoS</option>
+                    <option value="SQL_INJECTION">SQL-ін'єкція</option>
+                    <option value="RANSOMWARE">Ренсомвейр</option>
+                    <option value="ZERO_DAY">Уразливість нульового дня</option>
                   </select>
                 </div>
               </div>

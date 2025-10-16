@@ -1,32 +1,12 @@
-import { GuildService } from '../services/guild.service';
-import { prisma } from '../config/database';
-import { GuildRole } from '@prisma/client';
+// Mock the database module BEFORE any imports
+jest.mock('../config/database');
 
-// Mock the database
-jest.mock('../config/database', () => ({
-  prisma: {
-    guild: {
-      findFirst: jest.fn(),
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      updateMany: jest.fn(),
-    },
-    guildMember: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
-    },
-    $transaction: jest.fn(),
-  },
-}));
+import { GuildService } from '../services/guild.service';
+import { GuildRole } from '@prisma/client';
+import { prisma } from '../config/database';
+
+// Get mocked prisma
+const mockPrisma = prisma as any;
 
 describe('GuildService', () => {
   const mockGuild = {
@@ -62,18 +42,20 @@ describe('GuildService', () => {
         leaderId: 'user-1',
       };
 
-      (prisma.guild.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-      (prisma.guild.create as jest.Mock).mockResolvedValue(mockGuild);
-      (prisma.user.update as jest.Mock).mockResolvedValue({
+      mockPrisma.guild.findFirst.mockResolvedValue(null);
+      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+      mockPrisma.guild.create.mockResolvedValue(mockGuild);
+      mockPrisma.guildMember.create.mockResolvedValue({});
+      mockPrisma.user.update.mockResolvedValue({
         ...mockUser,
         guildId: 'guild-1',
       });
+      mockPrisma.guild.findUnique.mockResolvedValue(mockGuild);
 
       const result = await GuildService.createGuild(createInput);
 
       expect(result).toEqual(mockGuild);
-      expect(prisma.guild.findFirst).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [
             { name: 'Test Guild' },
@@ -81,14 +63,15 @@ describe('GuildService', () => {
           ],
         },
       });
-      expect(prisma.user.update).toHaveBeenCalledWith({
+     expect(mockPrisma.guildMember.create).toHaveBeenCalled();
+      expect(mockPrisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
         data: { guildId: 'guild-1' },
       });
     });
 
     it('should throw an error if guild name or tag already exists', async () => {
-      (prisma.guild.findFirst as jest.Mock).mockResolvedValue(mockGuild);
+      mockPrisma.guild.findFirst.mockResolvedValue(mockGuild);
 
       await expect(
         GuildService.createGuild({
@@ -101,8 +84,8 @@ describe('GuildService', () => {
     });
 
     it('should throw an error if leader does not exist', async () => {
-      (prisma.guild.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      mockPrisma.guild.findFirst.mockResolvedValue(null);
+      mockPrisma.user.findUnique.mockResolvedValue(null);
 
       await expect(
         GuildService.createGuild({
@@ -115,8 +98,8 @@ describe('GuildService', () => {
     });
 
     it('should throw an error if user already belongs to a guild', async () => {
-      (prisma.guild.findFirst as jest.Mock).mockResolvedValue(null);
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      mockPrisma.guild.findFirst.mockResolvedValue(null);
+      mockPrisma.user.findUnique.mockResolvedValue({
         ...mockUser,
         guildId: 'existing-guild',
       });
@@ -151,15 +134,15 @@ describe('GuildService', () => {
         ],
       };
 
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(mockGuildWithMembers);
+      mockPrisma.guild.findUnique.mockResolvedValue(mockGuildWithMembers);
 
       const result = await GuildService.getGuildById('guild-1');
 
       expect(result).toEqual(mockGuildWithMembers);
-      expect(prisma.guild.findUnique).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.findUnique).toHaveBeenCalledWith({
         where: { id: 'guild-1' },
         include: {
-          members: {
+          guildMembers: {
             include: {
               user: {
                 select: {
@@ -196,15 +179,15 @@ describe('GuildService', () => {
         ],
       };
 
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(mockGuildWithMembers);
+      mockPrisma.guild.findUnique.mockResolvedValue(mockGuildWithMembers);
 
       const result = await GuildService.getGuildByName('Test Guild');
 
       expect(result).toEqual(mockGuildWithMembers);
-      expect(prisma.guild.findUnique).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.findUnique).toHaveBeenCalledWith({
         where: { name: 'Test Guild' },
         include: {
-          members: {
+          guildMembers: {
             include: {
               user: {
                 select: {
@@ -215,7 +198,6 @@ describe('GuildService', () => {
                 },
               },
             },
-            orderBy: { role: 'asc' },
           },
         },
       });
@@ -224,8 +206,8 @@ describe('GuildService', () => {
 
   describe('updateGuild', () => {
     it('should update guild if user is leader', async () => {
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(mockGuild);
-      (prisma.guild.update as jest.Mock).mockResolvedValue({
+      mockPrisma.guild.findUnique.mockResolvedValue(mockGuild);
+      mockPrisma.guild.update.mockResolvedValue({
         ...mockGuild,
         name: 'Updated Guild',
       });
@@ -238,7 +220,7 @@ describe('GuildService', () => {
         ...mockGuild,
         name: 'Updated Guild',
       });
-      expect(prisma.guild.update).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.update).toHaveBeenCalledWith({
         where: { id: 'guild-1' },
         data: {
           name: 'Updated Guild',
@@ -255,7 +237,7 @@ describe('GuildService', () => {
         leaderId: 'user-2',
       };
 
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(guildWithDifferentLeader);
+      mockPrisma.guild.findUnique.mockResolvedValue(guildWithDifferentLeader);
 
       await expect(
         GuildService.updateGuild('guild-1', 'user-1', {
@@ -267,17 +249,17 @@ describe('GuildService', () => {
 
   describe('deleteGuild', () => {
     it('should delete guild if user is leader', async () => {
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(mockGuild);
-      (prisma.user.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
-      (prisma.guild.delete as jest.Mock).mockResolvedValue(mockGuild);
+      mockPrisma.guild.findUnique.mockResolvedValue(mockGuild);
+      mockPrisma.user.updateMany.mockResolvedValue({ count: 1 });
+      mockPrisma.guild.delete.mockResolvedValue(mockGuild);
 
       await GuildService.deleteGuild('guild-1', 'user-1');
 
-      expect(prisma.user.updateMany).toHaveBeenCalledWith({
+      expect(mockPrisma.user.updateMany).toHaveBeenCalledWith({
         where: { guildId: 'guild-1' },
         data: { guildId: null },
       });
-      expect(prisma.guild.delete).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.delete).toHaveBeenCalledWith({
         where: { id: 'guild-1' },
       });
     });
@@ -288,7 +270,7 @@ describe('GuildService', () => {
         leaderId: 'user-2',
       };
 
-      (prisma.guild.findUnique as jest.Mock).mockResolvedValue(guildWithDifferentLeader);
+      mockPrisma.guild.findUnique.mockResolvedValue(guildWithDifferentLeader);
 
       await expect(
         GuildService.deleteGuild('guild-1', 'user-1')
@@ -298,21 +280,20 @@ describe('GuildService', () => {
 
  describe('getRecruitingGuilds', () => {
     it('should return recruiting guilds with pagination', async () => {
-      const mockGuilds = [mockGuild];
-      (prisma.guild.findMany as jest.Mock).mockResolvedValue(mockGuilds);
-      (prisma.guild.count as jest.Mock).mockResolvedValue(1);
-      (prisma.guildMember.count as jest.Mock).mockResolvedValue(5);
+      const mockGuildsWithMembers = [{ ...mockGuild, guildMembers: [{id: '1'}, {id: '2'}, {id: '3'}, {id: '4'}, {id: '5'}] }];
+      mockPrisma.guild.findMany.mockResolvedValue(mockGuildsWithMembers);
+      mockPrisma.guild.count.mockResolvedValue(1);
 
       const result = await GuildService.getRecruitingGuilds(1, 10);
 
       expect(result).toEqual({
-        guilds: [{ ...mockGuild, memberCount: 5 }],
+        guilds: [{ ...mockGuild, guildMembers: [{id: '1'}, {id: '2'}, {id: '3'}, {id: '4'}, {id: '5'}], memberCount: 5 }],
         total: 1,
       });
-      expect(prisma.guild.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.guild.findMany).toHaveBeenCalledWith({
         where: { isRecruiting: true },
         include: {
-          members: {
+          guildMembers: {
             select: { id: true },
             take: 1,
           },

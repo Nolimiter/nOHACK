@@ -1,5 +1,5 @@
 module.exports = {
- preset: 'ts-jest',
+  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
@@ -8,10 +8,13 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/server.ts',
   ],
- coverageDirectory: 'coverage',
+  coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
 };

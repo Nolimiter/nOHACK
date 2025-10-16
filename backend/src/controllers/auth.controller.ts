@@ -30,9 +30,9 @@ export class AuthController {
       
       if (error.errors) {
         // Zod validation error
-        res.status(40).json({ 
+        res.status(400).json({
           error: 'Validation failed',
-          details: error.errors 
+          details: error.errors
         });
         return;
       }

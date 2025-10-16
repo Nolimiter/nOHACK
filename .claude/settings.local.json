@@ -3,14 +3,88 @@
     "allow": [
       "Bash(git ls-tree:*)",
       "Bash(git check-ignore:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
       "Bash(find:*)",
       "Bash(git revert:*)",
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm start:*)",
+      "Bash(dir:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell.exe -Command Stop-Process:*)",
+      "Bash(npm test:*)",
+      "Bash(if not exist __mocks__ mkdir __mocks__)",
+      "Bash(powershell.exe -Command \"New-Item -Path ''F:\\TRUE WAY\\backend\\src\\config\\__mocks__'' -ItemType Directory -Force\")"
     ],
     "deny": [],
     "ask": []
+  },
+  "mode": "strict",
+  "stopOnFirstError": false,
+  "maxRetries": 2,
+  "taskSplitting": {
+    "enabled": true,
+    "strategy": "sequential",
+    "stopOnFailure": false
+  },
+  "execution": {
+    "continueOnError": false,
+    "failFast": false,
+    "verbose": true,
+    "retryOnError": true,
+    "maxAttempts": 2
+  },
+  "reporting": {
+    "detailed": true,
+    "showStackTrace": true,
+    "returnFullLog": true,
+    "returnOnFailure": true
+  },
+  "ports": {
+    "backend": 4000,
+    "frontend": 3000
+  },
+  "deployment": {
+    "backend": {
+      "platform": "railway",
+      "type": "server",
+      "port": 4000,
+      "buildCommand": "npm run build",
+      "startCommand": "npm start",
+      "environment": "production"
+    },
+    "frontend": {
+      "platform": "vercel",
+      "type": "client",
+      "port": 3000,
+      "buildCommand": "npm run build",
+      "framework": "next.js",
+      "environment": "production"
+    }
+  },
+  "projectInfo": {
+    "name": "TRUE WAY",
+    "deploymentStrategy": "mono-repo with separate deployments",
+    "backendDeployedOn": "railway",
+    "backendPort": 4000,
+    "frontendDeployedOn": "vercel",
+    "frontendPort": 3000,
+    "gitRepository": "https://github.com/nolimiter/nohack",
+    "notes": "Backend: Railway (port 4000) | Frontend: Vercel (port 3000) | Git: nolimiter/nohack"
   }
 }

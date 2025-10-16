@@ -1,6 +1,7 @@
 import { User, Operation, OperationType, OperationStatus, Attack } from '@prisma/client';
 import prisma from '../config/database';
 import { calculateSuccessRate, calculateLoot, updatePlayerStats } from '../utils/gameLogic';
+import SocketManager from '../socket/socket.manager';
 
 export class HackingService {
   /**
@@ -12,13 +13,31 @@ export class HackingService {
     targetId: string,
     targetType: string = 'player'
   ): Promise<Operation> {
-    // Get user and target data
-    const [user, target] = await Promise.all([
-      prisma.user.findUnique({ where: { id: userId } }),
-      targetType === 'player' 
-        ? prisma.user.findUnique({ where: { id: targetId } }) 
-        : prisma.user.findFirst({ where: { username: targetId } }) // For NPC targets
-    ]);
+    // Get user data
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // For the hack page, we're targeting IP addresses which don't exist in our database
+    // In a real implementation, you would validate the IP address and check if it's a valid target
+    // For now, we'll simulate the target data since we're targeting IP addresses rather than users
+    let target;
+    if (targetType === 'player') {
+      target = await prisma.user.findUnique({ where: { id: targetId } });
+    } else if (targetType === 'npc') {
+      target = await prisma.user.findFirst({ where: { username: targetId } }); // For NPC targets
+    } else {
+      // For IP addresses, we'll simulate a target since real IPs aren't users in the database
+      // In a real game, you would have a different system for IP targets
+      target = {
+        id: `ip_${targetId}`, // Simulated ID for IP target
+        bitcoins: Math.floor(Math.random() * 100) + 10, // Simulate some bitcoins on the target
+        reputation: Math.floor(Math.random() * 100), // Simulate reputation
+        // Add other properties as needed for success rate calculation
+      } as any; // Cast as any since we're simulating
+    }
 
     if (!user) {
       throw new Error('User not found');
@@ -35,6 +54,7 @@ export class HackingService {
     }
 
     // Calculate success rate
+    // Note: For IP targets, we're using simulated target data which may affect success calculations
     const successRate = calculateSuccessRate(user, target, type);
 
     // Create operation record
@@ -57,7 +77,7 @@ export class HackingService {
     });
 
     // Process the operation (this would typically be done in a background job)
-    this.processOperation(operation.id, successRate);
+    this.processOperation(operation.id, successRate, userId);
 
     return operation;
   }
@@ -65,7 +85,7 @@ export class HackingService {
   /**
    * Process an operation in the background
    */
-  private static async processOperation(operationId: string, successRate: number): Promise<void> {
+  private static async processOperation(operationId: string, successRate: number, userId: string): Promise<void> {
     try {
       // Simulate operation progress over time
       const operation = await prisma.operation.findUnique({
@@ -90,7 +110,11 @@ export class HackingService {
           data: { progress },
         });
 
-        // In a real implementation, you would emit progress updates via WebSocket here
+        // Emit progress update to the user via WebSocket
+        SocketManager.emitToUser(userId, 'operation:progress', {
+          operationId: operation.id,
+          progress: progress
+        });
       }
 
       // Determine if operation was successful based on success rate
@@ -119,6 +143,13 @@ export class HackingService {
           completedAt: new Date(),
           result,
         },
+      });
+
+      // Emit completion event to the user
+      SocketManager.emitToUser(userId, 'operation:complete', {
+        operationId: operation.id,
+        success: isSuccessful,
+        result: result
       });
 
       // If successful, create an attack record
@@ -151,6 +182,16 @@ export class HackingService {
           },
         },
       });
+
+      // Emit completion event to the user even if the operation failed
+      SocketManager.emitToUser(userId, 'operation:complete', {
+        operationId: operationId,
+        success: false,
+        result: { 
+          success: false, 
+          error: (error instanceof Error) ? error.message : 'Unknown error occurred' 
+        }
+      });
     }
   }
 
@@ -167,6 +208,7 @@ export class HackingService {
       PORT_SCAN: 5,
       MINING: 0, // Mining doesn't cost anything to start
       DATA_THEFT: 40,
+      ZERO_DAY: 200, // Zero day is expensive
     };
 
     return costMap[type] || 10; // Default cost
@@ -185,6 +227,7 @@ export class HackingService {
       PORT_SCAN: 1, // Port scan doesn't cause damage
       MINING: 0,
       DATA_THEFT: 20,
+      ZERO_DAY: 30, // Zero day causes significant damage
     };
 
     return damageMap[type] || 5; // Default damage
@@ -238,7 +281,7 @@ export class HackingService {
     });
 
     // Update operation status
-    return prisma.operation.update({
+    const updatedOperation = await prisma.operation.update({
       where: { id: operationId },
       data: {
         status: OperationStatus.CANCELLED,
@@ -246,5 +289,14 @@ export class HackingService {
         result: { success: false, cancelled: true },
       },
     });
+    
+    // Emit completion event to the user
+    SocketManager.emitToUser(userId, 'operation:complete', {
+      operationId: updatedOperation.id,
+      success: false,
+      result: { success: false, cancelled: true }
+    });
+    
+    return updatedOperation;
   }
 }

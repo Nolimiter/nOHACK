@@ -3,13 +3,25 @@
 [build]
 builder = "NIXPACKS"
 
+[deploy]
+# Restart policy on failure
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
 [build.nixpacks]
 # Install dependencies and build only the backend
-build_cmd = "cd backend && npm install && npx prisma generate && npm run build"
+buildCommand = "cd backend && npm install && npx prisma generate && npm run build"
 
 # Start command for the backend server
-start_cmd = "cd backend && npm start"
+startCommand = "cd backend && npx prisma migrate deploy && npm start"
 
 # Node.js version to use
-[build.args]
+[variables]
 NODE_VERSION = "18.20.8"
+
+# Health check configuration
+[healthcheck]
+path = "/health"
+interval = 30
+timeout = 10
+retries = 3

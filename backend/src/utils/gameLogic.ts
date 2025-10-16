@@ -33,6 +33,9 @@ export function calculateSuccessRate(
     case OperationType.DATA_THEFT:
       baseRate = 45;
       break;
+    case OperationType.ZERO_DAY:
+      baseRate = 80; // Zero day has high success rate since it's unknown
+      break;
     default:
       baseRate = 50;
   }
@@ -104,6 +107,14 @@ export function calculateLoot(operationType: OperationType, targetId: string): a
       loot.data = { 
         openPorts: [22, 80, 443], // Mock open ports
         services: ['SSH', 'HTTP', 'HTTPS']
+      };
+      break;
+    case OperationType.ZERO_DAY:
+      loot.bitcoins = Math.floor(Math.random() * 1000) + 500; // High reward for zero day
+      loot.data = {
+        zeroDayExploit: true,
+        systemAccess: Math.random() > 0.8 ? true : false,
+        sensitiveFiles: Math.floor(Math.random() * 5) + 1
       };
       break;
     default:
@@ -191,6 +202,7 @@ function getExperienceGain(operationType: OperationType): number {
     PORT_SCAN: 5,
     MINING: 20,
     DATA_THEFT: 40,
+    ZERO_DAY: 100, // Zero day gives high XP
   };
 
   return xpMap[operationType] || 10;
@@ -209,6 +221,7 @@ function getReputationGain(operationType: OperationType): number {
     PORT_SCAN: 1,
     MINING: 4,
     DATA_THEFT: 7,
+    ZERO_DAY: 15, // Zero day gives high reputation
   };
 
   return repMap[operationType] || 2;

@@ -35,7 +35,7 @@ const RegisterPage: NextPage = () => {
     setLoading(true);
 
     try {
-      await register(username, email, password);
+      await register(username, email, password, confirmPassword);
     } catch (err: any) {
       setError(err.message || 'Помилка реєстрації');
     } finally {

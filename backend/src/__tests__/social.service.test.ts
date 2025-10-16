@@ -1,29 +1,11 @@
+// Mock the database module BEFORE any imports
+jest.mock('../config/database');
+
 import { SocialService } from '../services/social.service';
 import { prisma } from '../config/database';
 
-// Mock the database
-jest.mock('../config/database', () => ({
-  prisma: {
-    message: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-    },
-    friendship: {
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-  },
-}));
+// Get mocked prisma
+const mockPrisma = prisma as any;
 
 describe('SocialService', () => {
   const mockUser1 = {
@@ -70,9 +52,9 @@ describe('SocialService', () => {
 
  describe('sendMessage', () => {
     it('should send a message successfully', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser1); // sender
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser2); // receiver
-      (prisma.message.create as jest.Mock).mockResolvedValue(mockMessage);
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser1); // sender
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser2); // receiver
+      mockPrisma.message.create.mockResolvedValue(mockMessage);
 
       const result = await SocialService.sendMessage({
         senderId: 'user-1',
@@ -83,7 +65,7 @@ describe('SocialService', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(mockMessage);
-      expect(prisma.message.create).toHaveBeenCalledWith({
+      expect(mockPrisma.message.create).toHaveBeenCalledWith({
         data: {
           senderId: 'user-1',
           receiverId: 'user-2',
@@ -109,7 +91,7 @@ describe('SocialService', () => {
     });
 
     it('should fail to send message if sender or receiver does not exist', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(null); // sender not found
+      mockPrisma.user.findUnique.mockResolvedValueOnce(null); // sender not found
 
       const result = await SocialService.sendMessage({
         senderId: 'user-1',
@@ -126,14 +108,14 @@ describe('SocialService', () => {
   describe('getInbox', () => {
     it('should return user\'s inbox messages', async () => {
       const mockMessages = [mockMessage];
-      (prisma.message.findMany as jest.Mock).mockResolvedValue(mockMessages);
-      (prisma.message.count as jest.Mock).mockResolvedValue(1);
+      mockPrisma.message.findMany.mockResolvedValue(mockMessages);
+      mockPrisma.message.count.mockResolvedValue(1);
 
       const result = await SocialService.getInbox('user-2', 1, 10);
 
       expect(result.messages).toEqual(mockMessages);
       expect(result.total).toBe(1);
-      expect(prisma.message.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.message.findMany).toHaveBeenCalledWith({
         where: { receiverId: 'user-2' },
         include: {
           sender: {
@@ -153,14 +135,14 @@ describe('SocialService', () => {
   describe('getSentMessages', () => {
     it('should return user\'s sent messages', async () => {
       const mockMessages = [mockMessage];
-      (prisma.message.findMany as jest.Mock).mockResolvedValue(mockMessages);
-      (prisma.message.count as jest.Mock).mockResolvedValue(1);
+      mockPrisma.message.findMany.mockResolvedValue(mockMessages);
+      mockPrisma.message.count.mockResolvedValue(1);
 
       const result = await SocialService.getSentMessages('user-1', 1, 10);
 
       expect(result.messages).toEqual(mockMessages);
       expect(result.total).toBe(1);
-      expect(prisma.message.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.message.findMany).toHaveBeenCalledWith({
         where: { senderId: 'user-1' },
         include: {
           receiver: {
@@ -179,8 +161,8 @@ describe('SocialService', () => {
 
   describe('markAsRead', () => {
     it('should mark a message as read', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue(mockMessage);
-      (prisma.message.update as jest.Mock).mockResolvedValue({
+      mockPrisma.message.findUnique.mockResolvedValue(mockMessage);
+      mockPrisma.message.update.mockResolvedValue({
         ...mockMessage,
         isRead: true,
         readAt: new Date(),
@@ -189,14 +171,14 @@ describe('SocialService', () => {
       const result = await SocialService.markAsRead('message-1', 'user-2');
 
       expect(result).toBe(true);
-      expect(prisma.message.update).toHaveBeenCalledWith({
+      expect(mockPrisma.message.update).toHaveBeenCalledWith({
         where: { id: 'message-1' },
         data: { isRead: true, readAt: expect.any(Date) },
       });
     });
 
     it('should return false if message does not exist', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue(null);
+      mockPrisma.message.findUnique.mockResolvedValue(null);
 
       const result = await SocialService.markAsRead('message-1', 'user-2');
 
@@ -204,7 +186,7 @@ describe('SocialService', () => {
     });
 
     it('should return false if user is not the receiver', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue({
+      mockPrisma.message.findUnique.mockResolvedValue({
         ...mockMessage,
         receiverId: 'different-user',
       });
@@ -217,19 +199,19 @@ describe('SocialService', () => {
 
   describe('deleteMessage', () => {
     it('should delete a message', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue(mockMessage);
-      (prisma.message.delete as jest.Mock).mockResolvedValue(mockMessage);
+      mockPrisma.message.findUnique.mockResolvedValue(mockMessage);
+      mockPrisma.message.delete.mockResolvedValue(mockMessage);
 
       const result = await SocialService.deleteMessage('message-1', 'user-2');
 
       expect(result).toBe(true);
-      expect(prisma.message.delete).toHaveBeenCalledWith({
+      expect(mockPrisma.message.delete).toHaveBeenCalledWith({
         where: { id: 'message-1' },
       });
     });
 
     it('should return false if message does not exist', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue(null);
+      mockPrisma.message.findUnique.mockResolvedValue(null);
 
       const result = await SocialService.deleteMessage('message-1', 'user-2');
 
@@ -237,7 +219,7 @@ describe('SocialService', () => {
     });
 
     it('should return false if user is neither sender nor receiver', async () => {
-      (prisma.message.findUnique as jest.Mock).mockResolvedValue({
+      mockPrisma.message.findUnique.mockResolvedValue({
         ...mockMessage,
         senderId: 'different-user',
         receiverId: 'another-user',
@@ -251,16 +233,16 @@ describe('SocialService', () => {
 
   describe('sendFriendRequest', () => {
     it('should send a friend request successfully', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser1); // from user
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser2); // to user
-      (prisma.friendship.findFirst as jest.Mock).mockResolvedValue(null); // no existing friendship
-      (prisma.friendship.create as jest.Mock).mockResolvedValue(mockFriendship);
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser1); // from user
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser2); // to user
+      mockPrisma.friendship.findFirst.mockResolvedValue(null); // no existing friendship
+      mockPrisma.friendship.create.mockResolvedValue(mockFriendship);
 
       const result = await SocialService.sendFriendRequest('user-1', 'user-2');
 
       expect(result.success).toBe(true);
       expect(result.friendship).toEqual(mockFriendship);
-      expect(prisma.friendship.create).toHaveBeenCalledWith({
+      expect(mockPrisma.friendship.create).toHaveBeenCalledWith({
         data: {
           userFromId: 'user-1',
           userToId: 'user-2',
@@ -293,10 +275,10 @@ describe('SocialService', () => {
         acceptedAt: null,
       };
       
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser1);
-      (prisma.user.findUnique as jest.Mock).mockResolvedValueOnce(mockUser2);
-      (prisma.friendship.findFirst as jest.Mock).mockResolvedValue(existingFriendship);
-      (prisma.friendship.update as jest.Mock).mockResolvedValue({
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser1);
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser2);
+      mockPrisma.friendship.findFirst.mockResolvedValue(existingFriendship);
+      mockPrisma.friendship.update.mockResolvedValue({
         ...existingFriendship,
         status: 'ACCEPTED',
         acceptedAt: new Date(),
@@ -305,7 +287,7 @@ describe('SocialService', () => {
       const result = await SocialService.sendFriendRequest('user-1', 'user-2');
 
       expect(result.success).toBe(true);
-      expect(prisma.friendship.update).toHaveBeenCalledWith({
+      expect(mockPrisma.friendship.update).toHaveBeenCalledWith({
         where: { id: 'friendship-1' },
         data: {
           status: 'ACCEPTED',
@@ -329,6 +311,9 @@ describe('SocialService', () => {
     });
 
     it('should fail if user tries to add themselves', async () => {
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser1);
+      mockPrisma.user.findUnique.mockResolvedValueOnce(mockUser1);
+
       const result = await SocialService.sendFriendRequest('user-1', 'user-1');
 
       expect(result.success).toBe(false);
@@ -347,12 +332,12 @@ describe('SocialService', () => {
         }
       ];
       
-      (prisma.friendship.findMany as jest.Mock).mockResolvedValue(mockFriendships);
+      mockPrisma.friendship.findMany.mockResolvedValue(mockFriendships);
 
       const result = await SocialService.getFriends('user-1');
 
       expect(result).toEqual([mockUser2]);
-      expect(prisma.friendship.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.friendship.findMany).toHaveBeenCalledWith({
         where: {
           AND: [
             {

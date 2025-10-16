@@ -382,6 +382,7 @@ enum OperationType {
   PORT_SCAN
   MINING
   DATA_THEFT
+  ZERO_DAY
 }
 
 enum OperationStatus {

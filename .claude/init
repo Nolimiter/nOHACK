@@ -1,0 +1,209 @@
+# Claude Code - Project Instructions
+
+## Project Context
+
+This is the nOHACK project - a hackathon-themed multiplayer browser game with:
+- **Backend**: Node.js + Express + TypeScript (deployed on Railway)
+- **Frontend**: Next.js + TypeScript (deployed on Vercel)
+- **Database**: PostgreSQL + Prisma ORM
+- **Cache**: Redis
+- **Real-time**: Socket.io
+
+## Communication Style
+
+- Communicate in **Ukrainian** by default
+- Use concise, technical language
+- Provide step-by-step instructions when needed
+- Create documentation files for complex tasks
+
+## IMPORTANT: Always Use TodoWrite Tool
+
+**For EVERY task you work on, you MUST:**
+
+1. **Create a todo list at the start** using the `TodoWrite` tool
+2. **Update the todo list in real-time** as you progress through tasks
+3. **Mark tasks as completed immediately** after finishing them
+4. **Use proper task states**: `pending`, `in_progress`, `completed`
+
+### Task Structure
+
+Every todo item must have:
+- `content`: Imperative form (e.g., "Fix CORS configuration")
+- `activeForm`: Present continuous form (e.g., "Fixing CORS configuration")
+- `status`: Current state
+
+### Example Workflow
+
+```
+User asks: "Fix the CORS error on Railway"
+
+1. IMMEDIATELY create todo list:
+   - Analyze CORS configuration (in_progress)
+   - Update backend server.ts (pending)
+   - Test CORS headers (pending)
+   - Deploy to Railway (pending)
+
+2. Work through each task, updating status:
+   - Analyze CORS configuration (completed) ✓
+   - Update backend server.ts (in_progress)
+   ...
+
+3. Mark completed immediately after finishing:
+   - Update backend server.ts (completed) ✓
+```
+
+### When to Use TodoWrite
+
+**ALWAYS use for:**
+- Multi-step tasks (3+ steps)
+- Debugging and troubleshooting
+- Deployment tasks
+- Feature implementation
+- Code refactoring
+- Documentation creation
+
+**DO NOT use for:**
+- Single, trivial tasks
+- Simple questions
+- Quick file reads
+- Conversational responses
+
+## Project Structure
+
+```
+nOHACK/
+├── backend/          # Node.js backend (Railway)
+│   ├── src/
+│   │   ├── server.ts        # Main server file
+│   │   ├── routes/          # API routes
+│   │   ├── controllers/     # Request handlers
+│   │   ├── services/        # Business logic
+│   │   ├── middleware/      # Express middleware
+│   │   ├── config/          # Database, Redis, JWT config
+│   │   └── utils/           # Utilities
+│   ├── prisma/
+│   │   └── schema.prisma    # Database schema
+│   └── package.json
+│
+├── frontend/         # Next.js frontend (Vercel)
+│   ├── src/
+│   │   ├── pages/           # Next.js pages
+│   │   ├── components/      # React components
+│   │   ├── contexts/        # React contexts
+│   │   ├── services/        # API services
+│   │   └── styles/          # CSS styles
+│   └── package.json
+│
+└── nOHACK/          # Alternative frontend location
+    └── frontend/
+
+```
+
+## Environment Variables
+
+### Railway Backend
+```
+DATABASE_URL=postgresql://...
+REDIS_URL=redis://...
+JWT_SECRET=...
+BCRYPT_ROUNDS=12
+FRONTEND_URL=https://nohack.vercel.app
+NODE_ENV=production
+```
+
+### Vercel Frontend
+```
+NEXT_PUBLIC_API_URL=https://nohack-production.up.railway.app/api
+```
+
+## Common Tasks
+
+### Deploying Backend to Railway
+1. Create todo list for deployment steps
+2. Update code with fixes
+3. Commit and push to GitHub
+4. Railway auto-deploys
+5. Check logs and verify
+6. Mark all tasks as completed
+
+### Deploying Frontend to Vercel
+1. Create todo list for deployment steps
+2. Set environment variables on Vercel
+3. Trigger deployment
+4. Verify build success
+5. Test live site
+6. Mark all tasks as completed
+
+### Fixing CORS Issues
+1. Create todo list:
+   - Check backend CORS config
+   - Update allowed origins
+   - Add proper headers
+   - Deploy changes
+   - Test from frontend
+2. Work through each step with status updates
+3. Mark completed when verified
+
+### Adding New Features
+1. Create todo list breaking down feature into steps
+2. Implement step-by-step
+3. Update status after each step
+4. Test thoroughly
+5. Mark all completed
+
+## File Locations to Remember
+
+- Backend server: `backend/src/server.ts`
+- Auth routes: `backend/src/routes/auth.routes.ts`
+- Auth service: `backend/src/services/auth.service.ts`
+- Frontend API config: `frontend/src/services/authService.ts`
+- Auth context: `frontend/src/contexts/AuthContext.tsx`
+- Prisma schema: `backend/prisma/schema.prisma`
+
+## Best Practices
+
+1. **ALWAYS create and maintain todo lists** for multi-step tasks
+2. **Update todo status in real-time** - don't batch updates
+3. **Read files before editing** - use Read tool first
+4. **Test after changes** - verify everything works
+5. **Create documentation** for complex fixes
+6. **Commit with descriptive messages** - explain what and why
+7. **Check logs** after deployment - ensure no errors
+
+## Documentation Files
+
+- `RAILWAY_CORS_FIX.md` - Railway CORS troubleshooting
+- `VERCEL_FRONTEND_FIX.md` - Vercel deployment guide
+- `RAILWAY_VERCEL_DEPLOYMENT_CHECKLIST.md` - Complete deployment checklist
+- `BACKEND_RAILWAY_DEPLOYMENT.md` - Railway backend setup
+
+## Quick Commands
+
+```bash
+# Local development
+cd backend && npm run dev
+cd frontend && npm run dev
+
+# Railway CLI
+railway login
+railway variables
+railway logs
+
+# Database migrations
+npx prisma migrate dev
+npx prisma generate
+
+# Testing
+npm test
+
+# Build
+npm run build
+```
+
+## Remember
+
+- **Create todo lists for every task** - это обязательно!
+- Update status immediately after completing each step
+- Provide clear, actionable responses
+- Document complex solutions
+- Test thoroughly before marking as complete

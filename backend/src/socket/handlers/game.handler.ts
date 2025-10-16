@@ -8,17 +8,32 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     try {
       const userId = (socket as any).user.userId;
       
+      // Map frontend operation types to backend enum values
+      const operationTypeMap: Record<string, string> = {
+        'zero_day': 'ZERO_DAY',
+        'ddos': 'DDOS',
+        'sql_injection': 'SQL_INJECTION',
+        'ransomware': 'RANSOMWARE'
+      };
+      
+      const operationType = operationTypeMap[data.type] || data.type;
+      
       // Validate operation type
-      if (!Object.values(OperationType).includes(data.type as OperationType)) {
+      if (!Object.values(OperationType).includes(operationType as OperationType)) {
         socket.emit('error', 'Invalid operation type');
         return;
       }
       
       // Start the operation
+      // For IP addresses, we'll specify 'ip' as the target type
+      const isIpAddress = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(data.targetId);
+      const targetType = isIpAddress ? 'ip' : 'player';
+      
       const operation = await HackingService.startOperation(
         userId,
-        data.type as OperationType,
-        data.targetId
+        operationType as OperationType,
+        data.targetId,
+        targetType
       );
       
       // Emit success event
