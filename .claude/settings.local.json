@@ -29,7 +29,8 @@
       "Bash(powershell.exe -Command Stop-Process:*)",
       "Bash(npm test:*)",
       "Bash(if not exist __mocks__ mkdir __mocks__)",
-      "Bash(powershell.exe -Command \"New-Item -Path ''F:\\TRUE WAY\\backend\\src\\config\\__mocks__'' -ItemType Directory -Force\")"
+      "Bash(powershell.exe -Command \"New-Item -Path ''F:\\TRUE WAY\\backend\\src\\config\\__mocks__'' -ItemType Directory -Force\")",
+      "Bash(gh run list:*)"
     ],
     "deny": [],
     "ask": []
