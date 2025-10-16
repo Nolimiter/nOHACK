@@ -19,19 +19,30 @@ const RegisterPage: NextPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     // Validate passwords match
     if (password !== confirmPassword) {
       setError('Паролі не збігаються');
       return;
     }
-    
+
     // Validate password strength
     if (password.length < 8) {
       setError('Пароль має містити принаймні 8 символів');
       return;
     }
-    
+
+    // Check for uppercase, lowercase, number, and special character
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[@$!%*?&]/.test(password);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+      setError('Пароль має містити принаймні одну велику літеру, одну малу літеру, одну цифру та один спеціальний символ (@$!%*?&)');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -101,6 +112,9 @@ const RegisterPage: NextPage = () => {
               required
               minLength={8}
             />
+            <p className="text-xs text-gray-400 mt-1">
+              Мінімум 8 символів, включаючи велику літеру, малу літеру, цифру та спецсимвол (@$!%*?&)
+            </p>
           </div>
           
           <div className="mb-4">
