@@ -49,12 +49,17 @@ app.use(cors({
     if (allowedOrigins.includes(origin) || origin.includes('.vercel.app')) {
       callback(null, true);
     } else {
+      console.log(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization'],
+  maxAge: 86400, // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 app.use(compression()); // Compression
 app.use(express.json({ limit: '10mb' })); // JSON body parser
